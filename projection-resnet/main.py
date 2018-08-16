@@ -25,9 +25,9 @@ def main():
     d = 2
     n = 64
     randseed = 5
-    Ktrain = 16384
-    Kval = 1000
-    Ktest = 4096
+    Ktrain = 256
+    Kval = 100
+    Ktest = 100
 
     # seed rng
     np.random.seed(randseed)
@@ -38,7 +38,7 @@ def main():
     print('done.')
 
     # --- generate point/projected point pairs ---
-    print('Making data...')
+    print('Making training/validation/test sets...')
     dataTrain = makePointProjectionPairs(ineq, Ktrain)
     dataVal = makePointProjectionPairs(ineq, Kval)
     dataTest = makePointProjectionPairs(ineq, Ktest)
@@ -65,7 +65,7 @@ def main():
     print('done.')
 
     print('Making optimizer...')
-    optimizer = torch.optim.SGN(model.parameters(), 0.1,
+    optimizer = torch.optim.SGD(model.parameters(), 0.1,
                                 momentum=0.9,
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer)
