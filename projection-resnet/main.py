@@ -38,9 +38,12 @@ def main():
     print('done.')
 
     # --- generate point/projected point pairs ---
-    print('Making training/validation/test sets...')
+    print('Making training/validation/test sets:')
+    print('Training set...')
     dataTrain = makePointProjectionPairs(ineq, Ktrain)
+    print('Validation set...')
     dataVal = makePointProjectionPairs(ineq, Kval)
+    print('Test set...')
     dataTest = makePointProjectionPairs(ineq, Ktest)
     print('done.')
     #debugPlot(ineq, data['P'], data['Pproj'])
@@ -48,6 +51,7 @@ def main():
     # --- train network ---
     print('Constructing network...')
     model = Network(d)
+    model.cuda()
     print(model)
 
     print('Making training loader...')
@@ -68,7 +72,8 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), 0.1,
                                 momentum=0.9,
                                 weight_decay=1e-4)
-    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer)
+    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
+                                                        milestones=[30 80])
     print('done.')
 
     print('Training...')
