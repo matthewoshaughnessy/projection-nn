@@ -60,6 +60,10 @@ def main():
         ProjectionDataset(dataTrain['P'], dataTrain['Pproj']),
         batch_size=128, shuffle=True,
         num_workers=4, pin_memory=True)
+    print('sample points:')
+    for i in range(2):
+        sample = train_loader[i]
+        print(sample)
     print('done.')
 
     print('Making validation loader...')
