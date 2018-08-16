@@ -33,7 +33,9 @@ def main():
     np.random.seed(randseed)
 
     # --- generate inequalities to make convex set ---
+    print('Making data...')
     ineq = makeTestData(d, n, randseed)
+    print('done.')
 
     # --- generate point/projected point pairs ---
     print('Making data...')
@@ -70,7 +72,7 @@ def main():
     print('done.')
 
     print('Training...')
-    for epoch in range(nEpochs):
+    #for epoch in range(nEpochs):
 
         # train one epoch
         #print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
