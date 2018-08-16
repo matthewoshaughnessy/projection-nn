@@ -73,7 +73,7 @@ def main():
                                 momentum=0.9,
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                        milestones=[30 80])
+                                                        milestones=[30, 80])
     print('done.')
 
     print('Training...')
