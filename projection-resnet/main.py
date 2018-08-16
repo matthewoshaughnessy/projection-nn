@@ -25,6 +25,7 @@ def main():
     d = 2
     n = 64
     randseed = 5
+    nEpochs = 100
     Ktrain = 256
     Kval = 100
     Ktest = 100
