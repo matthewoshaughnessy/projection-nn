@@ -74,20 +74,21 @@ def main():
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                         milestones=[30, 80])
+
     print('done.')
 
     print('Training...')
-    #for epoch in range(nEpochs):
+    for epoch in range(nEpochs):
 
         # train one epoch
-        #print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
-        #train(train_loader, model, criterion, optimizer, epoch)
-        #lr_scheduler.step()
+        print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
+        train(train_loader, model, criterion, optimizer, epoch)
+        lr_scheduler.step()
 
         # evaluate on validation set
-        #prec1 = validate(val_loader, model, criterion)
+        prec1 = validate(val_loader, model, criterion)
 
-    print('done.')
+    print('done!')
     
     # 4. evaluate network
     # TODO
@@ -212,6 +213,54 @@ class ToTensor(object):
         p, pproj = sample['p'], sample['pproj']
         return {'p': torch.from_numpy(p),
                 'pproj': torch.from_numpy(pproj)}
+
+
+def train(train_loader, model, criterion, optimizer, epoch):
+    """
+        Run one train epoch
+    """
+    batch_time = AverageMeter()
+    losses = AverageMeter()
+    top1 = AverageMeter()
+
+    # switch to train mode
+    model.train()
+
+    end = time.time()
+    for i, (p, pproj) in enumerate(train_loader):
+
+        pproj = pproj.cuda(async=True)
+        input_var = torch.autograd.Variable(p).cuda()
+        target_var = torch.autograd.Variable(pproj)
+
+        # compute output
+        output = model(input_var)
+        loss = criterion(output, target_var)
+
+        # compute gradient and do SGD step
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        output = output.float()
+        loss = loss.float()
+        # measure accuracy and record loss
+        prec1 = accuracy(output.data, pproj)[0]
+        losses.update(loss.data[0], p.size(0))
+        top1.update(prec1[0], p.size(0))
+
+        # measure elapsed time
+        batch_time.update(time.time() - end)
+        end = time.time()
+
+        if i % args.print_freq == 0:
+            print('Epoch: [{0}][{1}/{2}]\t'
+                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                  'Prec@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
+                      epoch, i, len(train_loader), batch_time=batch_time,
+                      data_time=data_time, loss=losses, top1=top1))
 
 
 if __name__ == '__main__':
