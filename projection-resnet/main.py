@@ -34,10 +34,14 @@ def main():
 
     # 2. generate point/projected point pairs
     data = makePointProjectionPairs(ineq, K)
-    debugPlot(ineq, data['P'], data['Pproj'])
+    #debugPlot(ineq, data['P'], data['Pproj'])
 
     # 3. train network
-    # TODO
+    dataset = ProjectionDataset(data['P'], data['Pproj'])
+    print('Sample entries in dataset:')
+    for i in range(3):
+        sample = dataset[i]
+        print(i, sample['p'], sample['pproj'])
 
     # 4. evaluate network
     # TODO
@@ -118,7 +122,44 @@ def debugPlot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
             ax.plot(Pproj[0,i],Pproj[1,i],'r.')
 
     fig.savefig(savefile)
-    plt.show()
+
+
+def trainNetwork(arch="resnet20"):
+
+    print('Creating model...')
+    model = torch.nn.DataParallel(resnet.__dict__[arch]())
+    model.cuda()
+    cudnn.benchmark = True
+    print('done.')
+
+    print('Making training loader...')
+    train_loader = torch.utils.data.DataLoader(
+        datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomCrop(32, 4),
+            transforms.ToTensor(),
+            normalize,
+        ]), download=True),
+        batch_size=args.batch_size, shuffle=True,
+        num_workers=args.workers, pin_memory=True)
+    print('done.')
+
+
+class ProjectionDataset(Dataset):
+    """ Dataset for point / projected point. """
+
+    def __init__(self, P, Pproj):
+        self.P = P
+        self.Pproj = Pproj
+        self.d = P.shape[0]
+        self.K = P.shape[1]
+
+    def __len__(self):
+        return K
+
+    def __getitem__(self, i):
+        sample = {'p':P[:,i], 'pproj':Pproj[:,i]}
+        return sample
 
 
 if __name__ == '__main__':

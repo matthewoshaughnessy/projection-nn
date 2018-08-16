@@ -69,21 +69,6 @@ def main():
     model.cuda()
     print('done.')
 
-    # optionally resume from a checkpoint
-    print('checking if resume was specified')
-    if args.resume:
-        print('resume specified; checking if %s is valid' % (args.resume))
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch']
-            best_prec1 = checkpoint['best_prec1']
-            model.load_state_dict(checkpoint['state_dict'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(args.evaluate, checkpoint['epoch']))
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-
     cudnn.benchmark = True
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -109,7 +94,7 @@ def main():
         batch_size=128, shuffle=False,
         num_workers=args.workers, pin_memory=True)
 
-    # define loss function (criterion) and pptimizer
+    # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
 
     if args.half:
@@ -123,12 +108,6 @@ def main():
 
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                         milestones=[100, 150], last_epoch=args.start_epoch - 1)
-
-    if args.arch in ['resnet1202', 'resnet110']:
-        # for resnet1202 original paper uses lr=0.01 for first 400 minibatches for warm-up
-        # then switch back. In this implementation it will correspond for first epoch.
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = args.lr*0.1
 
     if args.evaluate:
         print('Evaluating...')
@@ -231,7 +210,6 @@ def validate(val_loader, model, criterion):
     end = time.time()
     print('About to validate...')
     for i, (input, target) in enumerate(val_loader):
-        print('Using validation example %d' % (i))
         target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input, volatile=True).cuda()
         target_var = torch.autograd.Variable(target, volatile=True)
@@ -267,12 +245,6 @@ def validate(val_loader, model, criterion):
           .format(top1=top1))
 
     return top1.avg
-
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    """
-    Save the training model
-    """
-    torch.save(state, filename)
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
