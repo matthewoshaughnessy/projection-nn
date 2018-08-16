@@ -38,12 +38,8 @@ def main():
     #debugPlot(ineq, data['P'], data['Pproj'])
 
     # 3. train network
-    dataset = ProjectionDataset(data['P'], data['Pproj'])
-    print('Sample entries in dataset:')
-    for i in range(3):
-        sample = dataset[i]
-        print(i, sample['p'], sample['pproj'])
-
+    trainNetwork(data['P'], data['Pproj'])
+    
     # 4. evaluate network
     # TODO
 
@@ -125,7 +121,7 @@ def debugPlot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
     fig.savefig(savefile)
 
 
-def trainNetwork(arch="resnet20"):
+def trainNetwork(P, Pproj, arch="resnet20"):
 
     print('Creating model...')
     model = torch.nn.DataParallel(resnet.__dict__[arch]())
@@ -135,12 +131,7 @@ def trainNetwork(arch="resnet20"):
 
     print('Making training loader...')
     train_loader = torch.utils.data.DataLoader(
-        datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomCrop(32, 4),
-            transforms.ToTensor(),
-            normalize,
-        ]), download=True),
+        ProjectionDataset(P, Pproj),
         batch_size=args.batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=True)
     print('done.')
@@ -161,6 +152,15 @@ class ProjectionDataset(torch.utils.data.Dataset):
     def __getitem__(self, i):
         sample = {'p':self.P[:,i], 'pproj':self.Pproj[:,i]}
         return sample
+
+
+class ToTensor(object):
+    """ Converts numpy array to torch Tensor """
+
+    def __call__(self, sample):
+        p, pproj = sample['p'], sample['pproj']
+        return {'p': torch.from_numpy(p),
+                'pproj': torch.from_numpy(pproj)}
 
 
 if __name__ == '__main__':
