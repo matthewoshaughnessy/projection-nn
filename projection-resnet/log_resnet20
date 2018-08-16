@@ -1,0 +1,86 @@
+creating model...
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Sequential
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+LambdaLayer
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Sequential
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+LambdaLayer
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Conv2d
+BatchNorm2d
+Conv2d
+BatchNorm2d
+Sequential
+BasicBlock
+Sequential
+Linear
+ResNet
+Traceback (most recent call last):
+  File "trainer.py", line 312, in <module>
+    main()
+  File "trainer.py", line 69, in main
+    model.cuda()
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/nn/modules/module.py", line 216, in cuda
+    return self._apply(lambda t: t.cuda(device))
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/nn/modules/module.py", line 146, in _apply
+    module._apply(fn)
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/nn/modules/module.py", line 146, in _apply
+    module._apply(fn)
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/nn/modules/module.py", line 152, in _apply
+    param.data = fn(param.data)
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/nn/modules/module.py", line 216, in <lambda>
+    return self._apply(lambda t: t.cuda(device))
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/_utils.py", line 69, in _cuda
+    return new_type(self.size()).copy_(self, async)
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/cuda/__init__.py", line 384, in _lazy_new
+    _lazy_init()
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/cuda/__init__.py", line 141, in _lazy_init
+    _check_driver()
+  File "/Users/matthewoshaughnessy/anaconda3/lib/python3.6/site-packages/torch/cuda/__init__.py", line 55, in _check_driver
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
