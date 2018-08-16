@@ -230,6 +230,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
     end = time.time()
     for i, (p, pproj) in enumerate(train_loader):
 
+        print('point:')
+        print(p)
+        print('projected point:')
+        print(pproj)
         pproj = pproj.cuda(async=True)
         input_var = torch.autograd.Variable(p).cuda()
         target_var = torch.autograd.Variable(pproj)
