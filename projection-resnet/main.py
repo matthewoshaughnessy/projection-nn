@@ -25,20 +25,62 @@ def main():
     d = 2
     n = 64
     randseed = 5
-    K = 16384
+    Ktrain = 16384
+    Kval = 1000
+    Ktest = 4096
 
     # seed rng
     np.random.seed(randseed)
 
-    # 1. generate inequalities to make convex set
+    # --- generate inequalities to make convex set ---
     ineq = makeTestData(d, n, randseed)
 
-    # 2. generate point/projected point pairs
-    data = makePointProjectionPairs(ineq, K)
+    # --- generate point/projected point pairs ---
+    print('Making data...')
+    dataTrain = makePointProjectionPairs(ineq, Ktrain)
+    dataVal = makePointProjectionPairs(ineq, Kval)
+    dataTest = makePointProjectionPairs(ineq, Ktest)
+    print('done.')
     #debugPlot(ineq, data['P'], data['Pproj'])
 
-    # 3. train network
-    trainNetwork(data['P'], data['Pproj'])
+    # --- train network ---
+    print('Constructing network...')
+    model = Network(d)
+    print(model)
+
+    print('Making training loader...')
+    train_loader = torch.utils.data.DataLoader(
+        ProjectionDataset(dataTrain['P'], dataTrain['Pproj']),
+        batch_size=128, shuffle=True,
+        num_workers=4, pin_memory=True)
+    print('done.')
+
+    print('Making validation loader...')
+    val_loader = torch.utils.data.DataLoader(
+        ProjectionDataset(dataVal['P'], dataVal['Pproj']),
+        batch_size=128, shuffle=True,
+        num_workers=4, pin_memory=True)
+    print('done.')
+
+    print('Making optimizer...')
+    optimizer = torch.optim.SGN(model.parameters(), 0.1,
+                                momentum=0.9,
+                                weight_decay=1e-4)
+    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer)
+    print('done.')
+
+    print('Training...')
+    for epoch in range(nEpochs):
+
+        # train one epoch
+        #print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
+        #train(train_loader, model, criterion, optimizer, epoch)
+        #lr_scheduler.step()
+
+        # evaluate on validation set
+        #prec1 = validate(val_loader, model, criterion)
+
+    print('done.')
     
     # 4. evaluate network
     # TODO
@@ -121,22 +163,6 @@ def debugPlot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
     fig.savefig(savefile)
 
 
-def trainNetwork(P, Pproj, arch="resnet20"):
-
-    print('Creating model...')
-    model = torch.nn.DataParallel(resnet.__dict__[arch]())
-    model.cuda()
-    cudnn.benchmark = True
-    print('done.')
-
-    print('Making training loader...')
-    train_loader = torch.utils.data.DataLoader(
-        ProjectionDataset(P, Pproj),
-        batch_size=128, shuffle=True,
-        num_workers=4, pin_memory=True)
-    print('done.')
-
-
 class ProjectionDataset(torch.utils.data.Dataset):
     """ Dataset for point / projected point. """
 
@@ -152,6 +178,24 @@ class ProjectionDataset(torch.utils.data.Dataset):
     def __getitem__(self, i):
         sample = {'p':self.P[:,i], 'pproj':self.Pproj[:,i]}
         return sample
+
+
+class Network(nn.Module):
+    """ Defines the simple network that will perform projections """
+
+    def __init__(self, d):
+        super(Network, self).__init__()
+        self.fc1 = torch.nn.Linear(d,2*d)
+        self.fc2 = torch.nn.Linear(2*d,4*d)
+        self.fc3 = torch.nn.Linear(4*d,2*d)
+        self.fc4 = torch.nn.Linear(2*d,d)
+
+    def forward(self, x):
+        x = torch.nn.functional.relu(self.fc1(x))
+        x = torch.nn.functional.relu(self.fc2(x))
+        x = torch.nn.functional.relu(self.fc3(x))
+        x = self.fc4(x)
+        return x
 
 
 class ToTensor(object):
