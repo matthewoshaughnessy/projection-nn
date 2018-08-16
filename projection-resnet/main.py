@@ -15,6 +15,7 @@ import torch.optim.lr_scheduler
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
+
 import resnet
 
 
@@ -145,7 +146,7 @@ def trainNetwork(arch="resnet20"):
     print('done.')
 
 
-class ProjectionDataset(Dataset):
+class ProjectionDataset(torch.utils.data.Dataset):
     """ Dataset for point / projected point. """
 
     def __init__(self, P, Pproj):
