@@ -25,7 +25,7 @@ def main():
     d = 2
     n = 64
     randseed = 5
-    K = 100
+    K = 16384
 
     # seed rng
     np.random.seed(randseed)
@@ -132,8 +132,8 @@ def trainNetwork(P, Pproj, arch="resnet20"):
     print('Making training loader...')
     train_loader = torch.utils.data.DataLoader(
         ProjectionDataset(P, Pproj),
-        batch_size=args.batch_size, shuffle=True,
-        num_workers=args.workers, pin_memory=True)
+        batch_size=128, shuffle=True,
+        num_workers=4, pin_memory=True)
     print('done.')
 
 
