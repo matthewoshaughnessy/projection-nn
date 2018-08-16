@@ -156,10 +156,10 @@ class ProjectionDataset(torch.utils.data.Dataset):
         self.K = P.shape[1]
 
     def __len__(self):
-        return K
+        return self.K
 
     def __getitem__(self, i):
-        sample = {'p':P[:,i], 'pproj':Pproj[:,i]}
+        sample = {'p':self.P[:,i], 'pproj':self.Pproj[:,i]}
         return sample
 
 
