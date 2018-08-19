@@ -83,7 +83,7 @@ def main():
         print('Epoch {0:d}/{1:d}\tlr = {2:.5e}\tmean l2 err = {3:.5f}'.format(
             epoch+1, nEpochs, currentLR, avgValLoss))
 
-    print('Training ({0:%d} epochs) complete!'.format(nEpochs))
+    print('Training ({0:d} epochs) complete!'.format(nEpochs))
 
     # --- save results on training/eval set ---
     print('Saving results...')
@@ -247,10 +247,10 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         # measure accuracy and record loss
         losses.update(loss.data.item())
 
-        if i % 64 == 0:
-            print('Epoch: [{0}][{1}/{2}]\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
-                      epoch, i, len(trainDataset), loss=losses))
+        #if i % 64 == 0:
+        #    print('Epoch: [{0}][{1}/{2}]\t'
+        #          'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
+        #              epoch, i, len(trainDataset), loss=losses))
 
 
 def validate(valDataset, model, criterion):
