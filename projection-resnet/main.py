@@ -238,8 +238,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
     end = time.time()
 
-    print('train_loader[0]:')
-    print(train_loader[0])
+    print('train_loader:')
+    print(train_loader)
 
     for i, (p,pproj) in enumerate(train_loader):
 
