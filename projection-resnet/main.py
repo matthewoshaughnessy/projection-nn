@@ -257,9 +257,7 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         output = output.float()
         loss = loss.float()
         # measure accuracy and record loss
-        prec1 = accuracy(output.data, pproj)[0]
         losses.update(loss.data[0], p.size(0))
-        top1.update(prec1[0], p.size(0))
 
         # measure elapsed time
         batch_time.update(time.time() - end)
@@ -269,10 +267,9 @@ def train(trainDataset, model, criterion, optimizer, epoch):
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Prec@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
-                      epoch, i, len(train_loader), batch_time=batch_time,
-                      data_time=data_time, loss=losses, top1=top1))
+                  'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
+                      epoch, i, len(trainDataset), batch_time=batch_time,
+                      data_time=data_time, loss=losses))
 
 
 class AverageMeter(object):
@@ -291,22 +288,6 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
-
-def accuracy(output, target, topk=(1,)):
-    """Computes the precision@k for the specified values of k"""
-    maxk = max(topk)
-    batch_size = target.size(0)
-
-    _, pred = output.topk(maxk, 1, True, True)
-    pred = pred.t()
-    correct = pred.eq(target.view(1, -1).expand_as(pred))
-
-    res = []
-    for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
-        res.append(correct_k.mul_(100.0 / batch_size))
-    return res
 
 
 if __name__ == '__main__':
