@@ -83,7 +83,7 @@ def main():
 
         # evaluate on validation set
         avgValLoss = validate(valDataset, model, criterion)
-        print('After epoch {:%d}, average loss on validation set =  {:.5f}'.format(
+        print('After epoch {0:%d}, average ||p-pproj||_2 on validation set = {1:.5f}'.format(
             epoch, avgValLoss))
 
     print('done!')
@@ -268,22 +268,17 @@ def validate(valDataset, model, criterion):
 
         # get validation sample
         sample = valDataset[i]
-        p = sample['p']
+        p = torch.autograd.Variable(sample['p']).cuda().float()
         pproj = sample['pproj']
-        input_var = torch.autograd.Variable(p).cuda().float()
-        target_var = torch.autograd.Variable(pproj).cuda().float()
 
         # compute output
-        output = model(input_var)
-        loss = criterion(output, target_var)
+        pproj_hat = model(p)
+        sample_l2err = np.linalg.norm(pproj.numpy() - pproj_hat.numpy())
+        total_l2err += sample_l2err
 
-        output = output.float()
-        loss = loss.float()
+    avg_l2err = total_l2err / len(valDataset)
 
-        # measure accuracy and record loss
-        losses.update(loss.data.item())
-
-    return losses.avg
+    return avg_l2err
 
 
 class AverageMeter(object):
