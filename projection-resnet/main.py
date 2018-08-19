@@ -268,12 +268,13 @@ def validate(valDataset, model, criterion):
 
         # get validation sample
         sample = valDataset[i]
-        p = torch.autograd.Variable(sample['p']).cuda().float()
+        p = sample['p']
         pproj = sample['pproj']
+        p_input = torch.autograd.Variable(p).cuda().float()
 
         # compute output
-        pproj_hat = model(p)
-        sample_l2err = np.linalg.norm(pproj.detach().numpy() - pproj_hat.detach().numpy())
+        pproj_hat = model(p_input).cpu()
+        sample_l2err = np.linalg.norm(pproj.numpy() - pproj_hat.detach().numpy())
         total_l2err += sample_l2err
 
     avg_l2err = total_l2err / len(valDataset)
