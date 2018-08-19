@@ -1,10 +1,12 @@
 import argparse
 import os
 import time
+import csv
 
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+import scipy.io
 
 import torch
 import torch.nn as nn
@@ -42,10 +44,13 @@ def main():
     print('Making training/validation/test sets:')
     print('Training set...')
     dataTrain = makePointProjectionPairs(ineq, Ktrain)
+    trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
     print('Validation set...')
     dataVal = makePointProjectionPairs(ineq, Kval)
+    valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
     print('Test set...')
     dataTest = makePointProjectionPairs(ineq, Ktest)
+    testDataset = ProjectionDataset(dataTest['P'], dataVal['Pproj'])
     print('done.')
     #debugPlot(ineq, data['P'], data['Pproj'])
 
@@ -56,40 +61,36 @@ def main():
     print(model)
     print('done.')
 
-    print('Making training dataset...')
-    trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
-    print('done.')
-
-    print('Making validation loader...')
-    valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
-    print('done.')
-
     print('Making optimizer...')
     optimizer = torch.optim.SGD(model.parameters(), 0.1,
                                 momentum=0.9,
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                         milestones=[30, 80])
-    criterion = torch.nn.SmoothL1Loss().cuda()
+    criterion = torch.nn.SmoothL1Loss().cuda() # huber loss
     print('done.')
 
     print('Training...')
     for epoch in range(nEpochs):
 
         # train one epoch
-        print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
+        currentLR = optimizer.param_groups[0]['lr']
         train(trainDataset, model, criterion, optimizer, epoch)
         lr_scheduler.step()
 
         # evaluate on validation set
         avgValLoss = validate(valDataset, model, criterion)
-        print('After epoch {0:d}, average ||p-pproj||_2 on validation set = {1:.5f}'.format(
-            epoch, avgValLoss))
+        print('Epoch {0:d}/{1:d}\tlr = {2:.5e}\tmean l2 err = {3:.5f}'.format(
+            epoch+1, nEpochs, currentLR, avgValLoss))
 
+    print('Training ({0:%d} epochs) complete!'.format(nEpochs))
+
+    # --- save results on training/eval set ---
+    print('Saving results...')
+    saveTestResults(trainDataset, model, 'results_train.mat')
+    saveTestResults(valDataset, model, 'results_val.mat')
+    saveTestResults(testdataset, model, 'results_test.mat')
     print('done!')
-    
-    # 4. evaluate network
-    # TODO
 
 
 def makeTestData(d, n, randseed, debugPlot=False):
@@ -277,6 +278,40 @@ def validate(valDataset, model, criterion):
     avg_l2err = total_l2err / len(valDataset)
 
     return avg_l2err
+
+def saveTestResults(dataset, model, filename):
+    """
+        Save model outputs to a mat file
+    """
+
+    model.eval()
+    sample = dataset[i]
+    d = sample['p'].shape[0]
+    P         = np.zeros(d,len(dataset))
+    Pproj     = np.zeros(d,len(dataset))
+    Pproj_hat = np.zeros(d,len(dataset))
+    errs      = np.zeros(len(dataset),1)
+
+    for i in range(len(dataset)):
+
+        # get sample
+        sample = dataset[i]
+        p = sample['p']
+        pproj = sample['pproj']
+        p_input = torch.autograd.Variable(p).cuda().float()
+
+        # compute output
+        pproj_hat = model(p_input).cpu()
+        l2err = np.linalg.norm(pproj.numpy() - pproj_hat.detach().numpy())
+
+        # store
+        P[:,i] = p
+        Pproj[:,i] = pproj
+        Pproj_hat[:,i] = pproj_hat
+        errs[i] = l2err
+
+    # save
+    scipy.io.savemat(filename, {'P':P, 'Pproj':Pproj, 'Pproj_hat':Pproj_hat, 'errs':errs})
 
 
 class AverageMeter(object):
