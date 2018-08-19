@@ -285,7 +285,7 @@ def saveTestResults(dataset, model, filename):
     """
 
     model.eval()
-    sample = dataset[i]
+    sample = dataset[0]
     d = sample['p'].shape[0]
     P         = np.zeros(d,len(dataset))
     Pproj     = np.zeros(d,len(dataset))
