@@ -78,7 +78,7 @@ def main():
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
                                                         milestones=[30, 80])
-    criterion = torch.nn.CrossEntropyLoss().cuda()
+    criterion = torch.nn.SmoothL1Loss().cuda()
     print('done.')
 
     print('Training...')
