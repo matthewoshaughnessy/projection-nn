@@ -58,18 +58,10 @@ def main():
 
     print('Making training dataset...')
     trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
-    print('sample points:')
-    for i in range(3):
-        sample = trainDataset[i]
-        print(sample)
     print('done.')
 
     print('Making validation loader...')
     valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
-    print('sample points:')
-    for i in range(3):
-        sample = valDataset[i]
-        print(sample)
     print('done.')
 
     print('Making optimizer...')
@@ -90,7 +82,9 @@ def main():
         lr_scheduler.step()
 
         # evaluate on validation set
-        prec1 = validate(valDataset, model, criterion)
+        avgValLoss = validate(valDataset, model, criterion)
+        print('After epoch {:%d}, average loss on validation set =  {:.5f}'.format(
+            epoch, avgValLoss))
 
     print('done!')
     
@@ -215,41 +209,32 @@ class ToTensor(object):
 
     def __call__(self, sample):
         p, pproj = sample['p'], sample['pproj']
-        return {'p': torch.from_numpy(p),
-                'pproj': torch.from_numpy(pproj)}
+        return {'p': torch.from_numpy(p), 'pproj': torch.from_numpy(pproj)}
 
 
 def train(trainDataset, model, criterion, optimizer, epoch):
     """
         Run one train epoch
     """
-    batch_time = AverageMeter()
     losses = AverageMeter()
-    top1 = AverageMeter()
 
     # switch to train mode
     model.train()
 
-    end = time.time()
-
     for i in range(len(trainDataset)):
     
+        # get training sample
         sample = trainDataset[i]
         p = sample['p']
         pproj = sample['pproj']
 
+        # send to gpu
         input_var = torch.autograd.Variable(p).cuda().float()
         target_var = torch.autograd.Variable(pproj).cuda().float()
 
         # compute output
         output = model(input_var)
-        print('output:')
-        print(output)
-        print('target_var:')
-        print(target_var)
         loss = criterion(output, target_var)
-        print('loss:')
-        print(loss)
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
@@ -261,14 +246,44 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         # measure accuracy and record loss
         losses.update(loss.data.item(), p.size(0))
 
-        # measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
-
-        if i % 1 == 0:
+        if i % 100 == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
                       epoch, i, len(trainDataset), loss=losses))
+
+
+def validate(valDataset, model, criterion):
+    """
+        Run evaluation on validation set
+    """
+    losses = AverageMeter()
+
+    # switch to evaluate mode
+    print('Switching to evaluate mode...')
+    model.eval()
+
+    end = time.time()
+    print('About to validate...')
+    for i in range(len(valDataset)):
+
+        # get validation sample
+        sample = valDataset[i]
+        p = sample['p']
+        pproj = sample['pproj']
+        input_var = torch.autograd.Variable(p, volatile=True).cuda()
+        target_var = torch.autograd.Variable(pproj, volatile=True).cuda()
+
+        # compute output
+        output = model(input_var)
+        loss = criterion(output, target_var)
+
+        output = output.float()
+        loss = loss.float()
+
+        # measure accuracy and record loss
+        losses.update(loss.data[0], input.size(0))
+
+    return losses.avg
 
 
 class AverageMeter(object):
