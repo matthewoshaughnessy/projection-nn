@@ -270,8 +270,8 @@ def validate(valDataset, model, criterion):
         sample = valDataset[i]
         p = sample['p']
         pproj = sample['pproj']
-        input_var = torch.autograd.Variable(p, volatile=True).cuda()
-        target_var = torch.autograd.Variable(pproj, volatile=True).cuda()
+        input_var = torch.autograd.Variable(p).cuda().float()
+        target_var = torch.autograd.Variable(pproj).cuda().float()
 
         # compute output
         output = model(input_var)
