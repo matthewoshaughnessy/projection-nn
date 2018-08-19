@@ -256,14 +256,11 @@ def validate(valDataset, model, criterion):
     """
         Run evaluation on validation set
     """
-    losses = AverageMeter()
+    total_l2err = 0.0
 
     # switch to evaluate mode
-    print('Switching to evaluate mode...')
     model.eval()
 
-    end = time.time()
-    print('About to validate...')
     for i in range(len(valDataset)):
 
         # get validation sample
