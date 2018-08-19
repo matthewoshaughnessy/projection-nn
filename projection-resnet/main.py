@@ -237,11 +237,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
     model.train()
 
     end = time.time()
-    for i in range(len(train_loader)):
-
-        sample = train_loader[i]
-        p = sample['p']
-        pproj = sample['pproj']
+    for i, (p,pproj) in enumerate(train_loader):
 
         print('point:')
         print(p)
