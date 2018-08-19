@@ -273,7 +273,7 @@ def validate(valDataset, model, criterion):
 
         # compute output
         pproj_hat = model(p)
-        sample_l2err = np.linalg.norm(pproj.numpy() - pproj_hat.numpy())
+        sample_l2err = np.linalg.norm(pproj.detach().numpy() - pproj_hat.detach().numpy())
         total_l2err += sample_l2err
 
     avg_l2err = total_l2err / len(valDataset)
