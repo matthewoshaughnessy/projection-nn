@@ -56,11 +56,8 @@ def main():
     print(model)
     print('done.')
 
-    print('Making training loader...')
+    print('Making training dataset...')
     trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
-    trainLoader = torch.utils.data.DataLoader(trainDataset,
-        batch_size=128, shuffle=True,
-        num_workers=4, pin_memory=True)
     print('sample points:')
     for i in range(3):
         sample = trainDataset[i]
@@ -69,9 +66,6 @@ def main():
 
     print('Making validation loader...')
     valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
-    valLoader = torch.utils.data.DataLoader(valDataset,
-        batch_size=128, shuffle=True,
-        num_workers=4, pin_memory=True)
     print('sample points:')
     for i in range(3):
         sample = valDataset[i]
@@ -145,7 +139,7 @@ def makePointProjectionPairs(inequalities, K):
             for j in range(n):
                 if inequalities['A'][j,:] @ pproj >= inequalities['b'][j]:
                     # project pproj onto hyperplane $$H = \left\{ x \in \R^d \colon x^T a^{(j)} = b^{(j)} \right\}$$:
-                    #  P_H(x) = x - \frac{x^T a^{(j)} - b}{\norm{a^{(j)}}_2^2} a^{(j)}
+                    #  $$P_H(x) = x - \frac{x^T a^{(j)} - b}{\norm{a^{(j)}}_2^2} a^{(j)}$$
                     aj = inequalities['A'][j,:]
                     pproj = pproj - 1/(np.transpose(aj)@aj)*(np.transpose(pproj)@aj-inequalities['b'][j]) * aj
                     #debugPlot(inequalities, p, pproj)
@@ -225,7 +219,7 @@ class ToTensor(object):
                 'pproj': torch.from_numpy(pproj)}
 
 
-def train(train_loader, model, criterion, optimizer, epoch):
+def train(trainDataset, model, criterion, optimizer, epoch):
     """
         Run one train epoch
     """
@@ -238,10 +232,11 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
     end = time.time()
 
-    print('train_loader:')
-    print(train_loader)
-
-    for i, (p,pproj) in enumerate(train_loader):
+    for i in range(len(trainDataset)):
+    
+        sample = trainDataset[i]
+        p = sample['p']
+        pproj = sample['pproj']
 
         print('index:')
         print(i)
