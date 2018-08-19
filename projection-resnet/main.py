@@ -145,7 +145,7 @@ def makePointProjectionPairs(inequalities, K):
                     #debugPlot(inequalities, p, pproj)
         Pproj[:,i] = pproj
 
-    return {'P':P, 'Pproj':Pproj}
+    return {'P':torch.from_numpy(P), 'Pproj':torch.from_numpy(Pproj)}
 
 
 def debugPlot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
