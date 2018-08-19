@@ -244,8 +244,8 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         print(p)
         print('projected point:')
         print(pproj)
-        input_var = torch.autograd.Variable(p).cuda()
-        target_var = torch.autograd.Variable(pproj).cuda()
+        input_var = torch.autograd.Variable(p).cuda().float()
+        target_var = torch.autograd.Variable(pproj).cuda().float()
 
         # compute output
         print(input_var)
