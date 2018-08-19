@@ -237,8 +237,14 @@ def train(train_loader, model, criterion, optimizer, epoch):
     model.train()
 
     end = time.time()
+
+    print('train_loader[1]:')
+    print(train_loader[i])
+
     for i, (p,pproj) in enumerate(train_loader):
 
+        print('index:')
+        print(i)
         print('point:')
         print(p)
         print('projected point:')
