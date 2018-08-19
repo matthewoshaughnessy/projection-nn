@@ -86,11 +86,11 @@ def main():
 
         # train one epoch
         print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
-        train(trainLoader, model, criterion, optimizer, epoch)
+        train(trainDataset, model, criterion, optimizer, epoch)
         lr_scheduler.step()
 
         # evaluate on validation set
-        prec1 = validate(valLoader, model, criterion)
+        prec1 = validate(valDataset, model, criterion)
 
     print('done!')
     
