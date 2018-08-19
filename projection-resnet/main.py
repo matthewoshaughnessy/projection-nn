@@ -54,23 +54,28 @@ def main():
     model = Network(d)
     model.cuda()
     print(model)
+    print('done.')
 
     print('Making training loader...')
-    train_loader = torch.utils.data.DataLoader(
-        ProjectionDataset(dataTrain['P'], dataTrain['Pproj']),
+    trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
+    trainLoader = torch.utils.data.DataLoader(trainDataset,
         batch_size=128, shuffle=True,
         num_workers=4, pin_memory=True)
     print('sample points:')
     for i in range(2):
-        sample = train_loader[i]
+        sample = trainDataset[i]
         print(sample)
     print('done.')
 
     print('Making validation loader...')
-    val_loader = torch.utils.data.DataLoader(
-        ProjectionDataset(dataVal['P'], dataVal['Pproj']),
+    valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
+    valLoader = torch.utils.data.DataLoader(valDataset,
         batch_size=128, shuffle=True,
         num_workers=4, pin_memory=True)
+    print('sample points:')
+    for i in range(2):
+        sample = valDataset[i]
+        print(sample)
     print('done.')
 
     print('Making optimizer...')
@@ -87,11 +92,11 @@ def main():
 
         # train one epoch
         print('Current lr {:.5e}'.format(optimizer.param_groups[0]['lr']))
-        train(train_loader, model, criterion, optimizer, epoch)
+        train(trainLoader, model, criterion, optimizer, epoch)
         lr_scheduler.step()
 
         # evaluate on validation set
-        prec1 = validate(val_loader, model, criterion)
+        prec1 = validate(valLoader, model, criterion)
 
     print('done!')
     
