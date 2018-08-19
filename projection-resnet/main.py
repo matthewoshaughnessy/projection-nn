@@ -83,7 +83,7 @@ def main():
 
         # evaluate on validation set
         avgValLoss = validate(valDataset, model, criterion)
-        print('After epoch {0:%d}, average ||p-pproj||_2 on validation set = {1:.5f}'.format(
+        print('After epoch {0:d}, average ||p-pproj||_2 on validation set = {1:.5f}'.format(
             epoch, avgValLoss))
 
     print('done!')
