@@ -244,9 +244,9 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         output = output.float()
         loss = loss.float()
         # measure accuracy and record loss
-        losses.update(loss.data.item(), p.size(0))
+        losses.update(loss.data.item())
 
-        if i % 100 == 0:
+        if i % 64 == 0:
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
                       epoch, i, len(trainDataset), loss=losses))
@@ -281,7 +281,7 @@ def validate(valDataset, model, criterion):
         loss = loss.float()
 
         # measure accuracy and record loss
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.data.item())
 
     return losses.avg
 
