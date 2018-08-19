@@ -248,6 +248,7 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         target_var = torch.autograd.Variable(pproj).cuda()
 
         # compute output
+        print(input_var)
         output = model(input_var)
         loss = criterion(output, target_var)
 
