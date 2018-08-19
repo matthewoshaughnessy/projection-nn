@@ -62,7 +62,7 @@ def main():
         batch_size=128, shuffle=True,
         num_workers=4, pin_memory=True)
     print('sample points:')
-    for i in range(2):
+    for i in range(3):
         sample = trainDataset[i]
         print(sample)
     print('done.')
@@ -73,7 +73,7 @@ def main():
         batch_size=128, shuffle=True,
         num_workers=4, pin_memory=True)
     print('sample points:')
-    for i in range(2):
+    for i in range(3):
         sample = valDataset[i]
         print(sample)
     print('done.')
@@ -237,7 +237,11 @@ def train(train_loader, model, criterion, optimizer, epoch):
     model.train()
 
     end = time.time()
-    for i, (p, pproj) in enumerate(train_loader):
+    for i in range(len(train_loader)):
+
+        sample = train_loader[i]
+        p = sample['p']
+        pproj = sample['pproj']
 
         print('point:')
         print(p)
