@@ -238,18 +238,15 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         p = sample['p']
         pproj = sample['pproj']
 
-        print('index:')
-        print(i)
-        print('point:')
-        print(p)
-        print('projected point:')
-        print(pproj)
         input_var = torch.autograd.Variable(p).cuda().float()
         target_var = torch.autograd.Variable(pproj).cuda().float()
 
         # compute output
-        print(input_var)
         output = model(input_var)
+        print('output:')
+        print(output)
+        print('target_var:')
+        print(target_var)
         loss = criterion(output, target_var)
 
         # compute gradient and do SGD step
