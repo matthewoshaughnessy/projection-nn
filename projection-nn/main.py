@@ -245,7 +245,6 @@ def validate(valDataset, model, criterion):
         Run evaluation on validation set
     """
     l2err_avg = util.Average()
-    total_l2err = 0.0
 
     # switch to evaluate mode
     model.eval()
@@ -260,12 +259,9 @@ def validate(valDataset, model, criterion):
 
         # compute output
         pproj_hat = model(p_input).cpu()
-        sample_l2err = np.linalg.norm(pproj.numpy() - pproj_hat.detach().numpy())
-        total_l2err += sample_l2err
+        l2err_avg.update(np.linalg.norm(pproj.numpy() - pproj_hat.detach().numpy()))
 
-    avg_l2err = total_l2err / len(valDataset)
-
-    return avg_l2err
+    return l2err_avg.get()
 
 def saveTestResults(dataset, model, filename):
     """
@@ -275,10 +271,10 @@ def saveTestResults(dataset, model, filename):
     model.eval()
     sample = dataset[0]
     d = sample['p'].shape[0]
-    P         = np.zeros(d,len(dataset))
-    Pproj     = np.zeros(d,len(dataset))
-    Pproj_hat = np.zeros(d,len(dataset))
-    errs      = np.zeros(len(dataset),1)
+    P         = np.zeros((d,len(dataset)))
+    Pproj     = np.zeros((d,len(dataset)))
+    Pproj_hat = np.zeros((d,len(dataset)))
+    errs      = np.zeros((len(dataset)))
 
     for i in range(len(dataset)):
 
