@@ -3,6 +3,15 @@ import matplotlib
 import matplotlib.pyplot as plt
 import scipy.io
 
+import torch
+import torch.nn as nn
+import torch.nn.parallel
+import torch.backends.cudnn as cudnn
+import torch.optim
+import torch.optim.lr_scheduler
+import torch.utils.data
+import torchvision.datasets as datasets
+
 
 def makeData(d, n, randseed, debugPlot=False):
     """
