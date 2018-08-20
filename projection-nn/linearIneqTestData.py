@@ -1,3 +1,9 @@
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import scipy.io
+
+
 def makeData(d, n, randseed, debugPlot=False):
     """
     Generate test data (intersection of linear inequality constraints)
