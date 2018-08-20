@@ -1,6 +1,4 @@
-import argparse
 import os
-import time
 import csv
 
 import numpy as np
@@ -15,10 +13,10 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 import torch.optim.lr_scheduler
 import torch.utils.data
-import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
 import resnet
+import util
 
 
 def main():
@@ -188,7 +186,9 @@ class ProjectionDataset(torch.utils.data.Dataset):
 
 
 class Network(nn.Module):
-    """ Defines the simple network that will perform projections """
+    """
+        Defines the simple network that will perform projections
+    """
 
     def __init__(self, d):
         super(Network, self).__init__()
@@ -205,19 +205,11 @@ class Network(nn.Module):
         return x
 
 
-class ToTensor(object):
-    """ Converts numpy array to torch Tensor """
-
-    def __call__(self, sample):
-        p, pproj = sample['p'], sample['pproj']
-        return {'p': torch.from_numpy(p), 'pproj': torch.from_numpy(pproj)}
-
-
-def train(trainDataset, model, criterion, optimizer, epoch):
+def train(trainDataset, model, criterion, optimizer):
     """
         Run one train epoch
     """
-    losses = AverageMeter()
+    lossAvg = util.Average()
 
     # switch to train mode
     model.train()
@@ -245,18 +237,14 @@ def train(trainDataset, model, criterion, optimizer, epoch):
         output = output.float()
         loss = loss.float()
         # measure accuracy and record loss
-        losses.update(loss.data.item())
-
-        #if i % 64 == 0:
-        #    print('Epoch: [{0}][{1}/{2}]\t'
-        #          'Loss {loss.val:.4f} ({loss.avg:.4f})'.format(
-        #              epoch, i, len(trainDataset), loss=losses))
+        lossAvg.update(loss.data.item())
 
 
 def validate(valDataset, model, criterion):
     """
         Run evaluation on validation set
     """
+    l2err_avg = util.Average()
     total_l2err = 0.0
 
     # switch to evaluate mode
@@ -312,24 +300,6 @@ def saveTestResults(dataset, model, filename):
 
     # save
     scipy.io.savemat(filename, {'P':P, 'Pproj':Pproj, 'Pproj_hat':Pproj_hat, 'errs':errs})
-
-
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
 
 
 if __name__ == '__main__':
