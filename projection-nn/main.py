@@ -73,7 +73,7 @@ def main():
 
         # train one epoch
         currentLR = optimizer.param_groups[0]['lr']
-        train(trainDataset, model, criterion, optimizer, epoch)
+        train(trainDataset, model, criterion, optimizer)
         lr_scheduler.step()
 
         # evaluate on validation set
