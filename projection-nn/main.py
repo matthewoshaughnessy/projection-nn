@@ -87,7 +87,7 @@ def main():
     print('Saving results...')
     saveTestResults(trainDataset, model, 'results_train.mat')
     saveTestResults(valDataset, model, 'results_val.mat')
-    saveTestResults(testdataset, model, 'results_test.mat')
+    saveTestResults(testDataset, model, 'results_test.mat')
     print('done!')
 
 
