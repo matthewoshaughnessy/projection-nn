@@ -52,7 +52,7 @@ def makePointProjectionPairs(inequalities, K):
         pproj = p
         for k in range(n): # project onto each of n hyperplanes, n times
             for j in range(n):
-                if inequalities['A'][j,:] @ pproj >= inequalities['b'][j]:
+                if inequalities['A'][j,:] @ pproj > inequalities['b'][j]:
                     # project pproj onto hyperplane $$H = \left\{ x \in \R^d \colon x^T a^{(j)} = b^{(j)} \right\}$$:
                     #  $$P_H(x) = x - \frac{x^T a^{(j)} - b}{\norm{a^{(j)}}_2^2} a^{(j)}$$
                     aj = inequalities['A'][j,:]
