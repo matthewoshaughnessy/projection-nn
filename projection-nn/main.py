@@ -25,7 +25,7 @@ def main():
     d = 2
     n = 64
     randseed = 5
-    nEpochs = 100
+    nEpochs = 20
     Ktrain = 256
     Kval = 100
     Ktest = 100
@@ -78,7 +78,7 @@ def main():
 
         # evaluate on validation set
         avgValLoss = validate(valDataset, model, criterion)
-        print('Epoch {0:d}/{1:d}\tlr = {2:.5e}\tmean l2 err = {3:.5f}'.format(
+        print('Epoch {0:d}/{1:d}\tlr = {2:.5e}\tmean l2 err = {3:.7f}'.format(
             epoch+1, nEpochs, currentLR, avgValLoss))
 
     print('Training ({0:d} epochs) complete!'.format(nEpochs))
@@ -291,7 +291,7 @@ def saveTestResults(dataset, model, filename):
         # store
         P[:,i] = p
         Pproj[:,i] = pproj
-        Pproj_hat[:,i] = pproj_hat
+        Pproj_hat[:,i] = pproj_hat.detach().numpy()
         errs[i] = l2err
 
     # save
