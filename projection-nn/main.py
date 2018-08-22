@@ -198,7 +198,7 @@ def validate(valDataset, model, criterion):
 
         # compute output
         if args['useCuda']:
-            pproj_hat = model(p_input).cpu()
+            pproj_hat = model(p_input).cpu().detach()
         else:
             pproj_hat = model(p_input).data
         l2err_avg.update(np.linalg.norm(pproj.numpy() - pproj_hat.numpy()))
