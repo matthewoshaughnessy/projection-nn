@@ -1,6 +1,8 @@
+import sys
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.animation import Animation
 import scipy.io
 
 import torch
@@ -75,7 +77,7 @@ def makePointProjectionPairs(inequalities, K):
     return {'P':torch.from_numpy(P), 'Pproj':torch.from_numpy(Pproj)}
 
 
-def plot(inequalities, P=np.nan, Pproj=np.nan, showplot=False, savefile="testdata.png"):
+def plot(inequalities, P=None, Pproj=None, Pproj_hat=None, showplot=False, savefile="testdata.png"):
 
     if inequalities['A'].shape[1] is not 2:
         print('Ambient dimension must be 2 to plot.')
@@ -96,14 +98,77 @@ def plot(inequalities, P=np.nan, Pproj=np.nan, showplot=False, savefile="testdat
     ax.axis('equal')
 
     # plot point / projected point pairs
-    if not np.isnan(P).any() and not np.isnan(Pproj).any():
+    if P is not None and Pproj is not None:
         for i in range(P.shape[1]):
             ax.plot(P[0,i], P[1,i], 'b.', markersize=1)
             ax.plot(Pproj[0,i], Pproj[1,i], 'r.', markersize=1)
+    if Pproj_hat is not None:
+        for i in range(P.shape[1]):
+            ax.plot(Pproj_hat[0,i], Pproj[1,i], 'g.', markersize=1)
 
     if showplot:
         plt.show()
 
     if savefile is not None:
         fig.savefig(savefile)
+
+
+def makevideo(inequalities, P, Pproj, Pproj_hat, savefile="trainvideo.mp4", errs=None, losses=None):
+
+    if inequalities['A'].shape[1] is not 2:
+        print('Ambient dimension must be 2 to plot.')
+        return
+
+    nframes = Pproj_hat.shape[2]
+    npoints = P.numpy().shape[1]
+
+    Writer = matplotlib.animation.writers['ffmpeg']
+    writer = Writer(fps=15)
+
+    fig = plt.figure()
+    l, = plt.plot([], [], 'k-o')
+
+    x1plt = np.linspace(-1.0, 1.0, 1000)
+    A = inequalities['A']
+    b = inequalities['b']
+
+    with writer.saving(fig, savefile, 300):
+
+        for framenum in range(nframes):
+
+            print('Making video: frame {0:d}/{1:d}'.format(framenum+1,nframes))
+            
+            plt.cla()
+
+            # plot inequalities
+            for i in range(b.shape[0]):
+                plt.plot(x1plt, (b[i]-A[i,0]*x1plt)/A[i,1], 'k-')
+
+            # plot line between ground truth and reconstructed projected point
+            for i in range(npoints):
+                plt.plot([Pproj[0,i], Pproj_hat[0,i,framenum]], [Pproj[1,i], Pproj_hat[1,i,framenum]],
+                         color='0.2', linewidth=0.2)
+
+            # plot ground truth point / projected point pairs
+            for i in range(npoints):
+                plt.plot(P[0,i], P[1,i], 'b.', markersize=5)
+                plt.plot(Pproj[0,i], Pproj[1,i], 'r.', markersize=5)
+
+            # plot network-projected points
+            for i in range(npoints):
+                plt.plot(Pproj_hat[0,i,framenum], Pproj_hat[1,i,framenum], 'g.', markersize=3)
+
+            plt.xlim(-1,1)
+            plt.ylim(-1,1)
+            plt.grid()
+            if errs is not None and losses is not None:
+                plt.title('Epoch {0:d}/{1:d} (mean l2 error = {2:.5f}; loss = {3:.5f})'.format(
+                          framenum+1,nframes,errs[framenum],losses[framenum]))
+            elif losses is not None:
+                plt.title('Epoch {0:d}/{1:d} (mean l2 error = {2:.5f})'.format(
+                          framenum+1,nframes,errs[framenum]))
+            else:
+                plt.title('Epoch {0:d}/{1:d}'.format(framenum+1,nframes))
+
+            writer.grab_frame()
 

@@ -22,9 +22,9 @@ import linearIneqTestData
 args = {'d'        : 2,
         'nIneq'    : 16,
         'randseed' : 5,
-        'nEpochs'  : 250,
-        'Ktrain'   : 1024,
-        'Kval'     : 100,
+        'nEpochs'  : 65,
+        'Ktrain'   : 128,
+        'Kval'     : 50,
         'Ktest'    : 100,
         'useCuda'  : False}
 
@@ -56,7 +56,8 @@ def main():
     dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'])
     testDataset = ProjectionDataset(dataTest['P'], dataVal['Pproj'])
     print('done.')
-    linearIneqTestData.plot(ineq, dataTrain['P'], dataTrain['Pproj'], showplot=False, savefile="traindata.png")
+    #linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
+    #                        showplot=False, savefile="traindata.png")
 
     # --- train network ---
     print('Constructing network...')
@@ -67,11 +68,11 @@ def main():
     print('done.')
 
     print('Making optimizer...')
-    optimizer = torch.optim.SGD(model.parameters(), 0.1,
+    optimizer = torch.optim.SGD(model.parameters(), 0.05,
                                 momentum=0.9,
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                        milestones=[150, 200])
+                                                        milestones=[225, 240])
     if args['useCuda']:
         criterion = torch.nn.SmoothL1Loss().cuda() # huber loss
     else:
@@ -79,6 +80,9 @@ def main():
     print('done.')
 
     print('Training...')
+    Pproj_hat = np.zeros((args['d'], args['Kval'], args['nEpochs']))
+    errs = np.zeros((args['nEpochs']))
+    losses = np.zeros((args['nEpochs']))
     for epoch in range(args['nEpochs']):
 
         # train one epoch
@@ -87,13 +91,20 @@ def main():
         lr_scheduler.step()
 
         # evaluate on validation set
-        avgValLoss = validate(valDataset, model, criterion)
+        errs[epoch], Pproj_hat[:,:,epoch] = validate(valDataset, model, criterion)
+        #linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
+        #                    showplot=False, savefile=None)
         print('Epoch {0:d}/{1:d}\tlr = {2:.5e}\tmean l2 err = {3:.7f}'.format(
-            epoch+1, args['nEpochs'], currentLR, avgValLoss))
+            epoch+1, args['nEpochs'], currentLR, errs[epoch]))
 
     print('Training ({0:d} epochs) complete!'.format(args['nEpochs']))
 
     # --- save results on training/eval set ---
+    print('Making video...')
+    linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
+                                 savefile="trainvideo.mp4", errs=errs)
+    print('done.')
+
     print('Saving results...')
     saveTestResults(trainDataset, model, 'results_train.mat')
     saveTestResults(valDataset, model, 'results_val.mat')
@@ -125,10 +136,10 @@ class Network(nn.Module):
 
     def __init__(self):
         super(Network, self).__init__()
-        self.fc1 = torch.nn.Linear(args['d'],2*args['d'])
-        self.fc2 = torch.nn.Linear(2*args['d'],8*args['d'])
-        self.fc3 = torch.nn.Linear(8*args['d'],4*args['d'])
-        self.fc4 = torch.nn.Linear(4*args['d'],args['d'])
+        self.fc1 = torch.nn.Linear(args['d'],4*args['d'])
+        self.fc2 = torch.nn.Linear(4*args['d'],16*args['d'])
+        self.fc3 = torch.nn.Linear(16*args['d'],8*args['d'])
+        self.fc4 = torch.nn.Linear(8*args['d'],args['d'])
 
     def forward(self, x):
         x = torch.nn.functional.relu(self.fc1(x))
@@ -182,6 +193,7 @@ def validate(valDataset, model, criterion):
         Run evaluation on validation set
     """
     l2err_avg = util.Average()
+    Pproj_hat = np.zeros((args['d'], args['Kval']))
 
     # switch to evaluate mode
     model.eval()
@@ -202,9 +214,10 @@ def validate(valDataset, model, criterion):
             pproj_hat = model(p_input).cpu().detach()
         else:
             pproj_hat = model(p_input).data
+        Pproj_hat[:,i] = pproj_hat
         l2err_avg.update(np.linalg.norm(pproj.numpy() - pproj_hat.numpy()))
 
-    return l2err_avg.get()
+    return l2err_avg.get(), Pproj_hat
 
 def saveTestResults(dataset, model, filename):
     """
@@ -218,6 +231,9 @@ def saveTestResults(dataset, model, filename):
     Pproj     = np.zeros((d,len(dataset)))
     Pproj_hat = np.zeros((d,len(dataset)))
     errs      = np.zeros((len(dataset)))
+
+    print('dataset shape:')
+    print(len(dataset))
 
     for i in range(len(dataset)):
 
