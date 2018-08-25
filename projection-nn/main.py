@@ -40,7 +40,7 @@ def main():
 
     # --- generate inequalities to make convex set ---
     print('Making data...')
-    ineq = linearIneqTestData.makeRandomData(args['d'], args['nIneq'], args['randseed'])
+    ineq = linearIneqTestData.makeRandomData(args['d'], args['nIneq'])
     print('done.')
 
     # --- generate point/projected point pairs ---
