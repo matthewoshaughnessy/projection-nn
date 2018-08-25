@@ -20,10 +20,10 @@ import linearIneqTestData
 
 
 args = {'d'        : 2,
-        'n'        : 64,
+        'nIneq'    : 16,
         'randseed' : 5,
-        'nEpochs'  : 500,
-        'Ktrain'   : 256,
+        'nEpochs'  : 250,
+        'Ktrain'   : 1024,
         'Kval'     : 100,
         'Ktest'    : 100,
         'useCuda'  : False}
@@ -40,7 +40,7 @@ def main():
 
     # --- generate inequalities to make convex set ---
     print('Making data...')
-    ineq = linearIneqTestData.makeData(args['d'], args['n'], args['randseed'])
+    ineq = linearIneqTestData.makeRandomData(args['d'], args['nIneq'], args['randseed'])
     print('done.')
 
     # --- generate point/projected point pairs ---
@@ -70,7 +70,7 @@ def main():
                                 momentum=0.9,
                                 weight_decay=1e-4)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                        milestones=[30, 80])
+                                                        milestones=[150, 200])
     if args['useCuda']:
         criterion = torch.nn.SmoothL1Loss().cuda() # huber loss
     else:
@@ -125,9 +125,9 @@ class Network(nn.Module):
     def __init__(self):
         super(Network, self).__init__()
         self.fc1 = torch.nn.Linear(args['d'],2*args['d'])
-        self.fc2 = torch.nn.Linear(2*args['d'],4*args['d'])
-        self.fc3 = torch.nn.Linear(4*args['d'],2*args['d'])
-        self.fc4 = torch.nn.Linear(2*args['d'],args['d'])
+        self.fc2 = torch.nn.Linear(2*args['d'],8*args['d'])
+        self.fc3 = torch.nn.Linear(8*args['d'],4*args['d'])
+        self.fc4 = torch.nn.Linear(4*args['d'],args['d'])
 
     def forward(self, x):
         x = torch.nn.functional.relu(self.fc1(x))

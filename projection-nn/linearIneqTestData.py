@@ -13,9 +13,20 @@ import torch.utils.data
 import torchvision.datasets as datasets
 
 
-def makeData(d, n, randseed, debugPlot=False):
+def makeSimpleOctagonData(debugPlot=False):
     """
-    Generate test data (intersection of linear inequality constraints)
+    Generates (8) inequalities that form a simple convex set: the octagon circumscribed by [-1,1]^2.
+
+    Inputs:
+        - debugPlot : generate plot of inequality constraints
+    """
+
+    return 0
+
+
+def makeRandomData(d, n, randseed, debugPlot=False):
+    """
+    Generate test data (intersection of RANDOM linear inequality constraints)
 
     Inputs:
         - d         : ambient dimension
@@ -38,12 +49,12 @@ def makeData(d, n, randseed, debugPlot=False):
         A[i,:] = -1 * A[i,:]
         b[i] = -1 * b[i]
 
-    return {'x':x, 'A':A, 'b':b}
+    return {'A':A, 'b':b}
 
 
 def makePointProjectionPairs(inequalities, K):
     
-    d = inequalities['x'].shape[0]
+    d = inequalities['A'].shape[1]
     n = inequalities['b'].shape[0]
     P = np.random.random((d,K))*2.0 - 1.0
     Pproj = np.zeros((d,K))
