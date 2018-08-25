@@ -13,26 +13,27 @@ import torch.utils.data
 import torchvision.datasets as datasets
 
 
-def makeSimpleOctagonData(debugPlot=False):
+def makeSimplePolygonData():
     """
-    Generates (8) inequalities that form a simple convex set: the octagon circumscribed by [-1,1]^2.
+    Generates 4 inequalities that form a simple convex set: the square rotated 45 degrees that is circumscribed by [-1,1]^2.
 
     Inputs:
         - debugPlot : generate plot of inequality constraints
     """
 
-    return 0
+    A = np.array([[+1.0, +1.0], [-1.0, +1.0], [+1.0, +1.0], [-1.0, +1.0]])
+    b = np.array([+1.0, -1.0, +1.0, -1.0]).transpose()
+
+    return {'A':A, 'b':b}
 
 
-def makeRandomData(d, n, randseed, debugPlot=False):
+def makeRandomData(d, n):
     """
     Generate test data (intersection of RANDOM linear inequality constraints)
 
     Inputs:
         - d         : ambient dimension
         - n         : number of constraints
-        - randseed  : value to seed random number generator
-        - debugPlot : (if d=2) generate plot of inequality constraints
     """
 
     # ground truth point
