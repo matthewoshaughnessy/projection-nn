@@ -21,8 +21,8 @@ def makeSimplePolygonData():
         - debugPlot : generate plot of inequality constraints
     """
 
-    A = np.array([[+1.0, +1.0], [-1.0, +1.0], [+1.0, +1.0], [-1.0, +1.0]])
-    b = np.array([+1.0, -1.0, +1.0, -1.0]).transpose()
+    A = np.array([[+1.0, +1.0], [+1.0, -1.0], [-1.0, -1.0], [-1.0, +1.0]])
+    b = np.array([+0.5, +0.5, +0.5, +0.5]).transpose()
 
     return {'A':A, 'b':b}
 
@@ -75,9 +75,9 @@ def makePointProjectionPairs(inequalities, K):
     return {'P':torch.from_numpy(P), 'Pproj':torch.from_numpy(Pproj)}
 
 
-def plot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
+def plot(inequalities, P=np.nan, Pproj=np.nan, showplot=False, savefile="testdata.png"):
 
-    if inequalities['x'].shape[0] is not 2:
+    if inequalities['A'].shape[1] is not 2:
         print('Ambient dimension must be 2 to plot.')
         return
 
@@ -86,17 +86,24 @@ def plot(inequalities, P=np.nan, Pproj=np.nan, savefile="testdata.png"):
     b = inequalities['b']
     x1plt = np.linspace(-1.0,1.0,1000)
     fig, ax = plt.subplots()
-    ax.plot(inequalities['x'][0], inequalities['x'][1], 'kx')
+    if 'x' in inequalities:
+        ax.plot(inequalities['x'][0], inequalities['x'][1], 'kx')
     for i in range(b.shape[0]):
-        ax.plot(x1plt, (b[i]-A[i,0]*x1plt)/A[i,1])
+        ax.plot(x1plt, (b[i]-A[i,0]*x1plt)/A[i,1], 'k-')
     plt.xlim(-1,1)
     plt.ylim(-1,1)
     ax.grid()
+    ax.axis('equal')
 
     # plot point / projected point pairs
     if not np.isnan(P).any() and not np.isnan(Pproj).any():
         for i in range(P.shape[1]):
-            ax.plot(P[0,i],P[1,i],'b.')
-            ax.plot(Pproj[0,i],Pproj[1,i],'r.')
+            ax.plot(P[0,i], P[1,i], 'b.', markersize=1)
+            ax.plot(Pproj[0,i], Pproj[1,i], 'r.', markersize=1)
 
-    fig.savefig(savefile)
+    if showplot:
+        plt.show()
+
+    if savefile is not None:
+        fig.savefig(savefile)
+

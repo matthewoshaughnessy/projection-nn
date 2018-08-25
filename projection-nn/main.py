@@ -40,7 +40,8 @@ def main():
 
     # --- generate inequalities to make convex set ---
     print('Making data...')
-    ineq = linearIneqTestData.makeRandomData(args['d'], args['nIneq'])
+    #ineq = linearIneqTestData.makeRandomData(args['d'], args['nIneq'])
+    ineq = linearIneqTestData.makeSimplePolygonData()
     print('done.')
 
     # --- generate point/projected point pairs ---
@@ -55,7 +56,7 @@ def main():
     dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'])
     testDataset = ProjectionDataset(dataTest['P'], dataVal['Pproj'])
     print('done.')
-    #linearIneqTestData.plot(ineq, data['P'], data['Pproj'])
+    linearIneqTestData.plot(ineq, dataTrain['P'], dataTrain['Pproj'], showplot=False, savefile="traindata.png")
 
     # --- train network ---
     print('Constructing network...')
