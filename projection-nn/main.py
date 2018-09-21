@@ -21,11 +21,11 @@ import linearIneqTestData
 
 args = {'d'        : 2,
         'nIneq'    : 16,
-        'randseed' : 5,
-        'nEpochs'  : 65,
-        'Ktrain'   : 128,
+        'randseed' : 6,
+        'nEpochs'  : 100,
+        'Ktrain'   : 2000,
         'Kval'     : 50,
-        'Ktest'    : 100,
+        'Ktest'    : 4096,
         'useCuda'  : False}
 
 
@@ -54,7 +54,7 @@ def main():
     valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
     print('Test set...')
     dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'])
-    testDataset = ProjectionDataset(dataTest['P'], dataVal['Pproj'])
+    testDataset = ProjectionDataset(dataTest['P'], dataTest['Pproj'])
     print('done.')
     #linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
     #                        showplot=False, savefile="traindata.png")
@@ -102,14 +102,16 @@ def main():
     # --- save results on training/eval set ---
     print('Making video...')
     linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
-                                 savefile="trainvideo.mp4", errs=errs)
+                                 savefile="trainvideo_2.mp4", errs=errs)
     print('done.')
 
     print('Saving results...')
-    saveTestResults(trainDataset, model, 'results_train.mat')
-    saveTestResults(valDataset, model, 'results_val.mat')
-    saveTestResults(testDataset, model, 'results_test.mat')
+    saveTestResults(trainDataset, model, 'results_train_nTrain2000.mat')
+    saveTestResults(valDataset, model, 'results_val_nTrain2000.mat')
+    saveTestResults(testDataset, model, 'results_test_nTrain2000.mat')
     print('done!')
+    
+    
 
 
 class ProjectionDataset(torch.utils.data.Dataset):
@@ -138,14 +140,23 @@ class Network(nn.Module):
         super(Network, self).__init__()
         self.fc1 = torch.nn.Linear(args['d'],4*args['d'])
         self.fc2 = torch.nn.Linear(4*args['d'],16*args['d'])
-        self.fc3 = torch.nn.Linear(16*args['d'],8*args['d'])
-        self.fc4 = torch.nn.Linear(8*args['d'],args['d'])
+        self.fc3 = torch.nn.Linear(16*args['d'],args['d'])
+#        self.fc4 = torch.nn.Linear(8*args['d'],4*args['d'])
+#        self.fc5 = torch.nn.Linear(4*args['d'],args['d'])
+        
+#        self.fc1 = torch.nn.Linear(args['d'],64*args['d'])
+#        self.fc2 = torch.nn.Linear(64*args['d'],8*args['d'])
+#        self.fc3 = torch.nn.Linear(8*args['d'],args['d'])
+#        
+        
 
     def forward(self, x):
         x = torch.nn.functional.relu(self.fc1(x))
         x = torch.nn.functional.relu(self.fc2(x))
-        x = torch.nn.functional.relu(self.fc3(x))
-        x = self.fc4(x)
+#        x = torch.nn.functional.relu(self.fc3(x))
+        x = self.fc3(x)
+#        x = torch.nn.functional.relu(self.fc4(x))
+#        x = self.fc5(x)
         return x
 
 
