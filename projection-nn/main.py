@@ -1,3 +1,4 @@
+import sys
 import os
 import csv
 
@@ -31,7 +32,21 @@ args = {'d'             : 2,
 
 def main():
 
-    # parameters
+    # --- parse parameters ---
+    for i in np.arange(1,len(sys.argv),1):
+        [key,val] = sys.argv[i].split('=',1)
+        if key in ['d','nIneq','randseed','nEpochs','Ktrain','Kval','Ktest']:
+            args[key] = int(val)
+        elif key == 'videofilename':
+            if val == 'None':
+                videofilename = None
+            else:
+                videofilename = val
+        else:
+            print('WARNING: invalid input option {0:s}'.format(key))
+
+
+    # check if cuda available
     args['useCuda'] = torch.cuda.is_available()
     print('CUDA enabled: {0:}'.format(args['useCuda']))
 
