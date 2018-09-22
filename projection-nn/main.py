@@ -19,14 +19,14 @@ import util
 import linearIneqTestData
 
 
-args = {'d'        : 2,
-        'nIneq'    : 16,
-        'randseed' : 6,
-        'nEpochs'  : 100,
-        'Ktrain'   : 2000,
-        'Kval'     : 50,
-        'Ktest'    : 4096,
-        'useCuda'  : False}
+args = {'d'             : 2,
+        'nIneq'         : 16,
+        'randseed'      : 6,
+        'nEpochs'       : 100,
+        'Ktrain'        : 2000,
+        'Kval'          : 50,
+        'Ktest'         : 4096,
+        'videofilename' : None}
 
 
 def main():
@@ -101,8 +101,9 @@ def main():
 
     # --- save results on training/eval set ---
     print('Making video...')
-    linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
-                                 savefile="trainvideo_2.mp4", errs=errs)
+    if args['videofilename'] is not None:
+        linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
+                                     savefile=args['videeofilename']+".mp4", errs=errs)
     print('done.')
 
     print('Saving results...')
