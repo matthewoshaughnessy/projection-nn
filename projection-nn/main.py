@@ -23,11 +23,13 @@ import linearIneqTestData
 args = {'d'             : 2,
         'nIneq'         : 16,
         'randseed'      : 6,
-        'nEpochs'       : 100,
-        'Ktrain'        : 2000,
+        'nEpochs'       : 20,
+        'Ktrain'        : 4096,
         'Kval'          : 50,
-        'Ktest'         : 4096,
-        'videofilename' : None}
+        'Ktest'         : 2000,
+        'nunits'        : None,   # None = default to [d,4d,16d,d]; otherwise specify as nunits=l1,l2,l3,l4
+        'datafilename'  : None,   # None = do not create result mat files
+        'videofilename' : None}   # None = do not create video
 
 
 def main():
@@ -37,13 +39,20 @@ def main():
         [key,val] = sys.argv[i].split('=',1)
         if key in ['d','nIneq','randseed','nEpochs','Ktrain','Kval','Ktest']:
             args[key] = int(val)
-        elif key == 'videofilename':
+        elif key in ['nunits']:
+            args[key] = [int(s) for s in val.split(',')]
+        elif key in ['videofilename','datafilename']:
             if val == 'None':
-                videofilename = None
+                args[key] = None
             else:
-                videofilename = val
+                args[key] = val
         else:
             print('WARNING: invalid input option {0:s}'.format(key))
+            
+    if args['nunits'] is None:
+        args['nunits'] = [args['d'],4*args['d'],16*args['d'],args['d']]
+    else:
+
 
 
     # check if cuda available
@@ -115,18 +124,24 @@ def main():
     print('Training ({0:d} epochs) complete!'.format(args['nEpochs']))
 
     # --- save results on training/eval set ---
-    print('Making video...')
-    if args['videofilename'] is not None:
+    print('Generating output files:')
+    if args['videofilename'] is None:
+        print('Video creation disabled.')
+    else:
+        print('Making video...')
         linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
-                                     savefile=args['videeofilename']+".mp4", errs=errs)
-    print('done.')
+                                     savefile=args['videofilename']+'.mp4', errs=errs)
+        print('done.')
 
-    print('Saving results...')
-    saveTestResults(trainDataset, model, 'results_train_nTrain2000.mat')
-    saveTestResults(valDataset, model, 'results_val_nTrain2000.mat')
-    saveTestResults(testDataset, model, 'results_test_nTrain2000.mat')
-    print('done!')
-    
+    if args['datafilename'] is None:
+        print('Data output disabled.')
+    else:
+        print('Saving results...')
+        saveTestResults(trainDataset, model, args['datafilename']+'_train.mat')
+        saveTestResults(valDataset,   model, args['datafilename']+'_val.mat')
+        saveTestResults(testDataset,  model, args['datafilename']+'_test.mat')
+        print('done.')
+    print('Output complete!')
     
 
 
@@ -154,25 +169,14 @@ class Network(nn.Module):
 
     def __init__(self):
         super(Network, self).__init__()
-        self.fc1 = torch.nn.Linear(args['d'],4*args['d'])
-        self.fc2 = torch.nn.Linear(4*args['d'],16*args['d'])
-        self.fc3 = torch.nn.Linear(16*args['d'],args['d'])
-#        self.fc4 = torch.nn.Linear(8*args['d'],4*args['d'])
-#        self.fc5 = torch.nn.Linear(4*args['d'],args['d'])
-        
-#        self.fc1 = torch.nn.Linear(args['d'],64*args['d'])
-#        self.fc2 = torch.nn.Linear(64*args['d'],8*args['d'])
-#        self.fc3 = torch.nn.Linear(8*args['d'],args['d'])
-#        
-        
+        self.fc1 = torch.nn.Linear(args['nunits'][0],args['nunits'][1])
+        self.fc2 = torch.nn.Linear(args['nunits'][1],args['nunits'][2])
+        self.fc3 = torch.nn.Linear(args['nunits'][2],args['nunits'][3])
 
     def forward(self, x):
         x = torch.nn.functional.relu(self.fc1(x))
         x = torch.nn.functional.relu(self.fc2(x))
-#        x = torch.nn.functional.relu(self.fc3(x))
         x = self.fc3(x)
-#        x = torch.nn.functional.relu(self.fc4(x))
-#        x = self.fc5(x)
         return x
 
 
@@ -258,9 +262,6 @@ def saveTestResults(dataset, model, filename):
     Pproj     = np.zeros((d,len(dataset)))
     Pproj_hat = np.zeros((d,len(dataset)))
     errs      = np.zeros((len(dataset)))
-
-    print('dataset shape:')
-    print(len(dataset))
 
     for i in range(len(dataset)):
 
