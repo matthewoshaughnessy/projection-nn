@@ -48,12 +48,11 @@ def main():
                 args[key] = val
         else:
             print('WARNING: invalid input option {0:s}'.format(key))
-            
+
     if args['nunits'] is None:
-        args['nunits'] = [args['d'],4*args['d'],16*args['d'],args['d']]
-    else:
+        args['nunits'] = [args['d'], 4*args['d'], 16*args['d'], args['d']]
 
-
+    print(args['nunits'])
 
     # check if cuda available
     args['useCuda'] = torch.cuda.is_available()
