@@ -52,8 +52,6 @@ def main():
     if args['nunits'] is None:
         args['nunits'] = [args['d'], 4*args['d'], 16*args['d'], args['d']]
 
-    print(args['nunits'])
-
     # check if cuda available
     args['useCuda'] = torch.cuda.is_available()
     print('CUDA enabled: {0:}'.format(args['useCuda']))

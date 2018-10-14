@@ -1,35 +1,11 @@
-python3 main.py nunits=2,2,2,2 datafilename=test_capacity_2222_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,2,2 datafilename=test_capacity_2222_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,2,2 datafilename=test_capacity_2222_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,2,2 datafilename=test_capacity_2222_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,2,2 datafilename=test_capacity_2222_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,4,2 datafilename=test_capacity_2242_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,4,2 datafilename=test_capacity_2242_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,4,2 datafilename=test_capacity_2242_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,4,2 datafilename=test_capacity_2242_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,2,4,2 datafilename=test_capacity_2242_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,2,2 datafilename=test_capacity_2422_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,2,2 datafilename=test_capacity_2422_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,2,2 datafilename=test_capacity_2422_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,2,2 datafilename=test_capacity_2422_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,2,2 datafilename=test_capacity_2422_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,4,2 datafilename=test_capacity_2442_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,4,2 datafilename=test_capacity_2442_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,4,2 datafilename=test_capacity_2442_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,4,2 datafilename=test_capacity_2442_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,4,2 datafilename=test_capacity_2442_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,8,2 datafilename=test_capacity_2482_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,8,2 datafilename=test_capacity_2482_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,8,2 datafilename=test_capacity_2482_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,8,2 datafilename=test_capacity_2482_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,4,8,2 datafilename=test_capacity_2482_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,4,2 datafilename=test_capacity_2842_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,4,2 datafilename=test_capacity_2842_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,4,2 datafilename=test_capacity_2842_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,4,2 datafilename=test_capacity_2842_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,4,2 datafilename=test_capacity_2842_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,8,2 datafilename=test_capacity_2882_1 randseed=1 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,8,2 datafilename=test_capacity_2882_2 randseed=2 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,8,2 datafilename=test_capacity_2882_3 randseed=3 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,8,2 datafilename=test_capacity_2882_4 randseed=4 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
-python3 main.py nunits=2,8,8,2 datafilename=test_capacity_2882_5 randseed=5 nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
+#!/bin/sh
+for i in {1..100}
+do
+	for u1 in {2..8} # number of neurons in first hidden layer
+	do
+		for u2 in {2..8} # number of neurons in second hidden layer
+		do
+			python3 main.py nunits=2,$u1,$u2,2 datafilename=test_capacity_$u1$u2_$i randseed=$i nEpochs=30 Ktrain=4096 Kval=50 Ktest=10000
+		done
+	done
+done
