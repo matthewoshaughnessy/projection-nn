@@ -1,12 +1,12 @@
 #!/bin/sh
 # test for loop
-for i in {1..10}
+for i in $(seq 1 4)
 do
-	for u1 in {1..3}
+	for u1 in $(seq 1 2)
 	do
-		for u2 in {1..3}
+		for u2 in $(seq 1 2)
 		do
-			echo "In loop: index $i, u1u2 = $u1$u25"
+			echo "In loop: index $i, u1u2 = $u1$u2"
 		done
 	done
 done
