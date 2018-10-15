@@ -53,7 +53,7 @@ def main():
         args['nunits'] = [args['d'], 4*args['d'], 16*args['d'], args['d']]
 
     # check if cuda available
-    args['useCuda'] = torch.cuda.is_available()
+    args['useCuda'] = False #torch.cuda.is_available()
     print('CUDA enabled: {0:}'.format(args['useCuda']))
 
     # seed rng
