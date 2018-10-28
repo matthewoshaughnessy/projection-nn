@@ -18,13 +18,22 @@ import torchvision.datasets as datasets
 def makeSimplePolygonData():
     """
     Generates 4 inequalities that form a simple convex set: the square rotated 45 degrees that is circumscribed by [-1,1]^2.
-
-    Inputs:
-        - debugPlot : generate plot of inequality constraints
     """
 
     A = np.array([[+1.0, +1.0], [+1.0, -1.0], [-1.0, -1.0], [-1.0, +1.0]])
     b = np.array([+0.5, +0.5, +0.5, +0.5]).transpose()
+
+    return {'A':A, 'b':b}
+
+
+def makeSimpleTriangleData():
+    """
+    Generates 3 inequalities that form a simple 45-45-90 triangluar convex set
+    (base parallel to the x-axis and circumscribed by [-1,1]^2)
+    """
+
+    A = np.array([[-1.0, -1.0], [+1.0, -1.0], [0.0, +1.0]])
+    b = np.array([-0.5, -0.5, -0.5]).transpose() # should be [-.5 -.5 +0.5] ?
 
     return {'A':A, 'b':b}
 
