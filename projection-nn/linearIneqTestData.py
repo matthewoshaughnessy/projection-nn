@@ -32,8 +32,8 @@ def makeSimpleTriangleData():
     (base parallel to the x-axis and circumscribed by [-1,1]^2)
     """
 
-    A = np.array([[-1.0, -1.0], [+1.0, -1.0], [0.0, +1.0]])
-    b = np.array([-0.5, -0.5, -0.5]).transpose() # should be [-.5 -.5 +0.5] ?
+    A = np.array([[+1.0, +1.0], [-1.0, +1.0], [0.0, -1.0]])
+    b = np.array([+0.5, +0.5, +0.5]).transpose() # should be [-.5 -.5 +0.5] ?
 
     return {'A':A, 'b':b}
 
@@ -75,11 +75,12 @@ def makePointProjectionPairs(inequalities, K):
         pproj = p
         for k in range(n): # project onto each of n hyperplanes, n times
             for j in range(n):
-                if inequalities['A'][j,:] @ pproj > inequalities['b'][j]:
+                aj = inequalities['A'][j,:]
+                bj = inequalities['b'][j]
+                if aj @ pproj > bj:
                     # project pproj onto hyperplane $$H = \left\{ x \in \R^d \colon x^T a^{(j)} = b^{(j)} \right\}$$:
                     #  $$P_H(x) = x - \frac{x^T a^{(j)} - b}{\norm{a^{(j)}}_2^2} a^{(j)}$$
-                    aj = inequalities['A'][j,:]
-                    pproj = pproj - 1/(np.transpose(aj)@aj)*(np.transpose(pproj)@aj-inequalities['b'][j]) * aj
+                    pproj = pproj - 1/(np.transpose(aj)@aj) * (np.transpose(pproj)@aj-bj) * aj
                     #debugPlot(inequalities, p, pproj)
         Pproj[:,i] = pproj
 

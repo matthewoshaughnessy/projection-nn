@@ -78,8 +78,8 @@ def main():
     dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'])
     testDataset = ProjectionDataset(dataTest['P'], dataTest['Pproj'])
     print('done.')
-    linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
-                            showplot=True, savefile="traindata.png")
+    #linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
+    #                        showplot=True, savefile="traindata.png")
 
     # --- train network ---
     print('Constructing network...')
@@ -127,7 +127,7 @@ def main():
         print('Video creation disabled.')
     else:
         print('Making video...')
-        linearIneqTestData.makevideo(ineq, dataVal['P'], dataVal['Pproj'], Pproj_hat,
+        linearIneqTestData.makevideo(ineq, dataTest['P'], dataTest['Pproj'], Pproj_hat,
                                      savefile=args['videofilename']+'.mp4', errs=errs)
         print('done.')
 
