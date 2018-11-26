@@ -27,6 +27,7 @@ args = {'d'             : 2,
         'Ktrain'        : 4096,
         'Kval'          : 50,
         'Ktest'         : 2000,
+        'bound'         : 1.0,    # generate data ~ U[-bound,bound]^d
         'nunits'        : None,   # None = default to [d,4d,16d,d]; otherwise specify as nunits=l1,l2,l3,l4
         'datafilename'  : None,   # None = do not create result mat files
         'videofilename' : None}   # None = do not create video
@@ -39,6 +40,8 @@ def main():
         [key,val] = sys.argv[i].split('=',1)
         if key in ['d','nIneq','randseed','nEpochs','Ktrain','Kval','Ktest']:
             args[key] = int(val)
+        elif key in ['bound']:
+            args[key] = float(val)
         elif key in ['nunits']:
             args[key] = [int(s) for s in val.split(',')]
         elif key in ['videofilename','datafilename']:
@@ -69,13 +72,13 @@ def main():
     # --- generate point/projected point pairs ---
     print('Making training/validation/test sets:')
     print('Training set...')
-    dataTrain = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktrain'])
+    dataTrain = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktrain'], args['bound'])
     trainDataset = ProjectionDataset(dataTrain['P'], dataTrain['Pproj'])
     print('Validation set...')
-    dataVal = linearIneqTestData.makePointProjectionPairs(ineq, args['Kval'])
+    dataVal = linearIneqTestData.makePointProjectionPairs(ineq, args['Kval'], args['bound'])
     valDataset = ProjectionDataset(dataVal['P'], dataVal['Pproj'])
     print('Test set...')
-    dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'])
+    dataTest = linearIneqTestData.makePointProjectionPairs(ineq, args['Ktest'], args['bound'])
     testDataset = ProjectionDataset(dataTest['P'], dataTest['Pproj'])
     print('done.')
     #linearIneqTestData.plot(ineq, P=dataTrain['P'], Pproj=dataTrain['Pproj'], Pproj_hat=None,
