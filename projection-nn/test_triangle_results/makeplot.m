@@ -1,6 +1,6 @@
 load triangle_test.mat
 clf;
-lims = 1.0*[-1 1 -1 1];
+lims = 2.0*[-1 1 -1 1];
 
 if false
   plot(P(1,:),P(2,:),'k.'); hold on;
@@ -13,7 +13,7 @@ mask = false(7,size(P,2));
 mask(1,:) = P'*[0;1] > -0.5 & P'*[-1;1] > 0.5 & P'*[1;1] < 0.5;
 mask(2,:) = P'*[-1;1] > 0.5 & P'*[1;1] > 0.5;
 mask(3,:) = P'*[0;1] > -0.5 & P'*[-1;1] < 0.5 & P'*[1;1] > 0.5;
-mask(4,:) = P'*[0;1]  -0.5;% & P'*[1;1] > 0.5;
+mask(4,:) = P'*[0;1] < -0.5 & P'*[1;1] > 0.5;
 mask(5,:) = P'*[0;1] < -0.5 & P'*[-1;1] < 0.5 & P'*[1;1] < 0.5;
 mask(6,:) = P'*[0;1] < -0.5 & P'*[-1;1] > 0.5;
 mask(7,:) = P'*[0;1] > -0.5 & P'*[-1;1] < 0.5 & P'*[1;1] < 0.5;
@@ -39,4 +39,12 @@ for i = 1:7
   title({sprintf('Region %d',i), ...
     sprintf('mean l2 err = %.4f',region_meanl2errs(i))});
   set(gca,'fontsize',16);
+end
+
+exportPlots = true;
+if exportPlots
+  fprintf('Exporting...');
+  fprintf('pdf...'); export_fig plot.pdf
+  fprintf('png...'); export_fig plot.png
+  fprintf('done!\n');
 end
