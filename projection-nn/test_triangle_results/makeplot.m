@@ -30,7 +30,7 @@ plot(Pproj(1,:),Pproj(2,:),'b.');
 plot(Pproj_hat(1,:),Pproj_hat(2,:),'r.');
 axis(lims); grid on; axis square;
 title('Original data'); set(gca,'fontsize',16);
-legend('Ground truth projection','Network projection','Point');
+legend('Point','Ground truth projection','Network projection');
 for i = 1:7
   subplot(2,4,i+1);
   plot(P(1,:),P(2,:),'k.','linew',1); hold on;
